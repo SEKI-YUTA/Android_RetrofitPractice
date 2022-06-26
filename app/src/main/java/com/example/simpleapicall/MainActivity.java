@@ -1,12 +1,15 @@
 package com.example.simpleapicall;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.simpleapicall.Models.ApiResponse;
@@ -29,69 +32,33 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 // API Key
 //eb632193384348238d832abb8e6ae41b
-public class MainActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
-    private Retrofit retrofit;
-    private List<Article> articleList;
+public class MainActivity extends AppCompatActivity implements ArticleClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        NewsListFragment newsListFragment = new NewsListFragment(this);
 
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-
-
-        Dexter.withContext(this).withPermission(Manifest.permission.INTERNET)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                        appSetUP();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                        Toast.makeText(MainActivity.this, "internet permission is required", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                        permissionToken.continuePermissionRequest();
-                    }
-                }).check();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.frame_news, newsListFragment)
+                .commit();
 
     }
 
-    private void appSetUP() {
-        retrofit = new Retrofit.Builder()
-                .baseUrl("https://newsapi.org/v2/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        NewsApiService newsApiService = retrofit.create(NewsApiService.class);
-        Call<ApiResponse> call = newsApiService.getHeadline("jp", getResources().getString(R.string.API_Key));
-        call.enqueue(new Callback<ApiResponse>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if(!response.isSuccessful()) {
-                    Toast.makeText(MainActivity.this, response.code(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                ApiResponse apiResponse = response.body();
-                articleList = apiResponse.getArticles();
+    @Override
+    public void onArticleClicked(String newsUrl) {
+        Bundle bundle = new Bundle();
+        bundle.putString("newsUrl", newsUrl);
 
-                ArticleAdapter adapter = new ArticleAdapter(MainActivity.this, articleList);
-                recyclerView.setAdapter(adapter);
+        BrowserFragment browserFragment = new BrowserFragment();
+        browserFragment.setArguments(bundle);
 
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "cannot get news data", Toast.LENGTH_SHORT).show();
-            }
-        });
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.frame_news, browserFragment)
+                .commit();
     }
 }

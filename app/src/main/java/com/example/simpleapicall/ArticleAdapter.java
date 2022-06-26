@@ -20,10 +20,12 @@ import java.util.List;
 public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder>{
     private Context context;
     private List<Article> articleList;
+    private ArticleClickListener listener;
 
-    public ArticleAdapter(Context context, List<Article> articleList) {
+    public ArticleAdapter(Context context, List<Article> articleList, ArticleClickListener listener) {
         this.context = context;
         this.articleList = articleList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -43,8 +45,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder>{
             @Override
             public void onClick(View view) {
                 Toast.makeText(context, article.getUrl(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(article.getUrl()));
-                context.startActivity(intent);
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(article.getUrl()));
+//                context.startActivity(intent);
+                listener.onArticleClicked(article.getUrl());
             }
         });
         if((article.getUrlToImage()) != null) {
