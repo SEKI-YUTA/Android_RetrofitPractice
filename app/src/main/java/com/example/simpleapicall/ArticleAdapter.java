@@ -1,6 +1,9 @@
 package com.example.simpleapicall;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.simpleapicall.Models.Article;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -33,12 +37,22 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder>{
         Article article = articleList.get(holder.getAdapterPosition());
         holder.tv_title.setText(article.getTitle());
         holder.tv_description.setText(article.getDescription());
+        holder.tv_title.setSelected(true);
+        holder.tv_description.setSelected(true);
         holder.newsCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(context, article.getUrl(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(article.getUrl()));
+                context.startActivity(intent);
             }
         });
+        if((article.getUrlToImage()) != null) {
+            Picasso.get()
+                    .load(article.getUrlToImage())
+                    .placeholder(R.drawable.ic_no_image)
+                    .into(holder.img_newsPic);
+        }
     }
 
     @Override
