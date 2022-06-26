@@ -38,6 +38,7 @@ public class BrowserFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getFragmentManager().beginTransaction().remove(BrowserFragment.this).commit();
+                // https://akira-watson.com/android/fragment-fragment.html
             }
         });
 

@@ -61,4 +61,9 @@ public class MainActivity extends AppCompatActivity implements ArticleClickListe
                 .add(R.id.frame_news, browserFragment)
                 .commit();
     }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+    }
 }
